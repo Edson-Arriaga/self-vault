@@ -1,28 +1,43 @@
 {
   "expo": {
-    "name": "self-vault",
+    "name": "Self Vault",
     "slug": "self-vault",
-    "version": "1.0.0",
+    "version": "1.0.2",
+    "backgroundColor": "#FEFAE0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/self-vault-adaptive-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/images/self-vault-adaptive-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true
+      "backgroundColor": "#FEFAE0"
     },
     "android": {
+      "package": "com.edsonarri20.selfvault",
+      "versionCode": 3,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/self-vault-adaptive-icon.png",
+        "backgroundColor": "#FEFAE0"
+      }
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app needs access to your photos to help you save and manage your memories."
+        }
+      ],
+      "expo-sqlite"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "25f6f6a1-24d9-442a-a461-e21323bc68e3"
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "bundler": "metro"
     }
   }
 }
