@@ -1,12 +1,8 @@
 import { Image, Pressable, View } from "react-native";
-import selectAndAddImage from "../../utils/selectAndAddImage";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useImageStore } from "../../stores/imageStore";
-import { useMemoryStore } from "../../stores/memoryStore";
 import { Memory } from "../../types";
-import { useCameraPermissions } from "expo-image-picker";
-import { verifyCameraPermissions } from "../../utils/verifyCameraPermissions";
-import { useAppStatePermissionCheck } from "../../hooks/useAppStatePermissionCheck";
+import { useImages } from "../../hooks/useImages";
 
 type ImageButtonProps = {
   imageUri: string
@@ -18,26 +14,30 @@ type ImageButtonProps = {
 export default function ImageButton({imageUri, memId, outerContainerStyle, innerContainerStyle} : ImageButtonProps) {
   
   const navigation = useNavigation()
-  const {addImageLocal} = useMemoryStore()
-  const {setIsImageModalActive, setActiveUriImage} = useImageStore()
-  const [cameraPermissionInformation, requestPermission] = useCameraPermissions()
-  useAppStatePermissionCheck(requestPermission)
+  const route = useRoute()
+  const {setIsImageModalActive, setActiveImageUri: setActiveUriImage} = useImageStore()
+  const {verifyImagePermissions, selectAndAddImage} = useImages()
+  
+  function refreshScreenHandler(){
+    setTimeout(() => {
+      //@ts-ignore
+      navigation.replace(route.name, {categoryId: route.params.categoryId, memoryId: route.params.memoryId }) 
+    }, 500)
+  }
 
   async function addOrShowImageHandler(){
     if(imageUri){
       setActiveUriImage(imageUri)
       setIsImageModalActive(true)
     } else {
-      const hasPermission = await verifyCameraPermissions(cameraPermissionInformation, requestPermission)
+      const hasPermission = await verifyImagePermissions(refreshScreenHandler)
       
-      if(!hasPermission){
-        return
-      }
-      
-      const response = await selectAndAddImage(memId, addImageLocal)
-      if(response?.error) {
-        navigation.navigate('ErrorScreen')
-        return
+      if(hasPermission){
+        const response = await selectAndAddImage(memId)
+        if(response?.error) {
+          navigation.navigate('ErrorScreen')
+          return
+        }
       }
     }
   }

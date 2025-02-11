@@ -15,7 +15,7 @@ type MemorieCardProps = {
 export default function MemoryCard({mem, setIsDeleteModalActive, setActiveId} : MemorieCardProps) {
 
   const navigation = useNavigation()
-
+  
   async function deleteMemorieHandler(){
     setActiveId(mem.id)
     setIsDeleteModalActive(true)

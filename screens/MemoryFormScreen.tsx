@@ -11,17 +11,14 @@ import { addMemory, getMemoryById, updateMemory } from "../db/memories";
 import { Memory, MemoryForm } from "../types";
 import { useMemoryStore } from "../stores/memoryStore";
 import Toast from "react-native-toast-message";
-import { useCameraPermissions } from "expo-image-picker";
 import BottomButton from "../components/ui/BottomButton";
-import selectAndAddImage from "../utils/selectAndAddImage";
-import { verifyCameraPermissions } from "../utils/verifyCameraPermissions";
-import { useAppStatePermissionCheck } from "../hooks/useAppStatePermissionCheck";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useImages } from "../hooks/useImages";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MemoryFormScreen'>;
 
 export default function MemoryFormScreen({navigation, route} : Props) {
-  
+
   const [prevData, setPrevData] = useState<MemoryForm>()
   const [isDeleteImageIconActive, setIsDeleteImageIconActive] = useState(false)
   
@@ -34,8 +31,7 @@ export default function MemoryFormScreen({navigation, route} : Props) {
   })
 
   const { addMemoryLocal, updateMemoryLocal } = useMemoryStore()
-  const [cameraPermissionInformation, requestPermission] = useCameraPermissions()
-  useAppStatePermissionCheck(requestPermission)
+  const {selectAndAddImage, verifyImagePermissions} = useImages()
   
   const categoryName = route.params.categoryName
   const selectedEditId = route.params.selectedEditId
@@ -67,19 +63,18 @@ export default function MemoryFormScreen({navigation, route} : Props) {
       headerShown: true,
       title: ''
     })
+    
   }, [navigation])
    
   const pickImageHandler = async () => {
-    const hasPermission = await verifyCameraPermissions(cameraPermissionInformation, requestPermission)
+    const hasPermission = await verifyImagePermissions(refreshScreenHandler)
 
-    if(!hasPermission){
-      return
-    }
-
-    const result = await selectAndAddImage()
-    if(!result?.canceled){
-      setData(prev => ({...prev, imageUri: result?.temporalUri!}))
-      setIsDeleteImageIconActive(true)
+    if(hasPermission){
+      const result = await selectAndAddImage()
+      if(!result?.canceled){
+        setData(prev => ({...prev, imageUri: result?.temporalUri!}))
+        setIsDeleteImageIconActive(true)
+      }
     }
   }
 
@@ -170,6 +165,12 @@ export default function MemoryFormScreen({navigation, route} : Props) {
 
   function selectDayHandler(){
     setIsActiveCalendar(prev => !prev)
+  }
+
+  function refreshScreenHandler(){
+    setTimeout(() => {
+      navigation.replace('MemoryFormScreen', {categoryName, selectedEditId}) 
+    }, 500)
   }
   
   return (

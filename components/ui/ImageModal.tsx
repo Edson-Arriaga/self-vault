@@ -6,7 +6,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 export default function ImageModal() {
   
-  const {setIsImageModalActive, activeUriImage, setActiveUriImage} = useImageStore()
+  const {setIsImageModalActive, activeImageUri: activeUriImage, setActiveImageUri: setActiveUriImage} = useImageStore()
   
   function onCloseModal(){
     setIsImageModalActive(false)

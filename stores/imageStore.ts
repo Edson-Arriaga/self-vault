@@ -1,15 +1,23 @@
 import { create } from "zustand"
 
 interface ImageStoreState {
-  activeUriImage: string,
-  setActiveUriImage: (id: string) => void,
+  activeImageUri: string,
+  setActiveImageUri: (id: string) => void,
   isImageModalActive: boolean,
-  setIsImageModalActive: (status: boolean) => void 
+  setIsImageModalActive: (status: boolean) => void
+  permissionsAllowed: boolean,
+  setPemissionsAllowed: (status: boolean) => void,
+  isMemoryListScreenUpdated: boolean,
+  setIsMemoryListScreenUpdated: (status: boolean) => void,
 }
 
 export const useImageStore = create<ImageStoreState>()((set) => ({
-  activeUriImage: '',
-  setActiveUriImage: (id) => set(() => ({activeUriImage: id})),
+  activeImageUri: '',
+  setActiveImageUri: (id) => set(() => ({activeImageUri: id})),
   isImageModalActive: false,
-  setIsImageModalActive: (status) => set(() => ({isImageModalActive: status}))
+  setIsImageModalActive: (status) => set(() => ({isImageModalActive: status})),
+  permissionsAllowed: false,
+  setPemissionsAllowed: (status) => set(() => ({permissionsAllowed: status})),
+  isMemoryListScreenUpdated: false,
+  setIsMemoryListScreenUpdated: (status) => set(() => ({isMemoryListScreenUpdated: status})),
 }))
