@@ -15,11 +15,12 @@ export default function ImageButton({imageUri, memId, outerContainerStyle, inner
   
   const navigation = useNavigation()
   const route = useRoute()
-  const {setIsImageModalActive, setActiveImageUri: setActiveUriImage} = useImageStore()
+  const {setIsImageModalActive, setActiveImageUri: setActiveUriImage, setIsMemoryListScreenUpdated} = useImageStore()
   const {verifyImagePermissions, selectAndAddImage} = useImages()
   
   function refreshScreenHandler(){
     setTimeout(() => {
+      setIsMemoryListScreenUpdated(false)
       //@ts-ignore
       navigation.replace(route.name, {categoryId: route.params.categoryId, memoryId: route.params.memoryId }) 
     }, 500)

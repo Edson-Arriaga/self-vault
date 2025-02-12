@@ -6,12 +6,12 @@ import * as FileSystem from 'expo-file-system'
 import { Memory } from "../types"
 import { useMemoryStore } from "../stores/memoryStore";
 import { useImageStore } from "../stores/imageStore";
+import { useEffect } from "react";
 
 export function useImages(){
-  
   const [cameraPermissionInformation, requestPermission] = useCameraPermissions()
   const {addImageLocal} = useMemoryStore()
-  const {setPemissionsAllowed} = useImageStore()
+  const {setPemissionsAllowed, setIsMemoryListScreenUpdated} = useImageStore()
   
   async function verifyImagePermissions( refreshScreenHandler?: () => void ){
     if (cameraPermissionInformation?.status === PermissionStatus.UNDETERMINED) {
@@ -32,8 +32,13 @@ export function useImages(){
             }
           } },
         ]
-      );
+      )
       setPemissionsAllowed(false)
+      return false
+    }
+
+    if (cameraPermissionInformation?.status === undefined) {
+      setIsMemoryListScreenUpdated(false)
       return false
     }
     setPemissionsAllowed(true)

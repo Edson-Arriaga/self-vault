@@ -55,7 +55,6 @@ export default function MemoryListScreen({route, navigation} : Props) {
     }
   }, [isMemoryListScreenUpdated, permissionsAllowed, isFocus])
 
-
   useEffect(() => {
     navigation.setOptions({
       headerShown: true,

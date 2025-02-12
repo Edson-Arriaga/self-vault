@@ -18,6 +18,6 @@ export const useImageStore = create<ImageStoreState>()((set) => ({
   setIsImageModalActive: (status) => set(() => ({isImageModalActive: status})),
   permissionsAllowed: false,
   setPemissionsAllowed: (status) => set(() => ({permissionsAllowed: status})),
-  isMemoryListScreenUpdated: false,
+  isMemoryListScreenUpdated: true,
   setIsMemoryListScreenUpdated: (status) => set(() => ({isMemoryListScreenUpdated: status})),
 }))

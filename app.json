@@ -23,12 +23,7 @@
     },
     "plugins": [
       "expo-font",
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "The app needs access to your photos to help you save and manage your memories."
-        }
-      ],
+      "expo-image-picker",
       "expo-sqlite"
     ],
     "extra": {
