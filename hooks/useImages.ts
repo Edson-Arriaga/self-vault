@@ -1,50 +1,12 @@
-import { PermissionStatus, useCameraPermissions } from "expo-image-picker";
-import { Alert, Linking } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 import { addImage } from "../db/memories"
 import * as FileSystem from 'expo-file-system'
 import { Memory } from "../types"
 import { useMemoryStore } from "../stores/memoryStore";
-import { useImageStore } from "../stores/imageStore";
-import { useEffect } from "react";
 
 export function useImages(){
-  const [cameraPermissionInformation, requestPermission] = useCameraPermissions()
   const {addImageLocal} = useMemoryStore()
-  const {setPemissionsAllowed, setIsMemoryListScreenUpdated} = useImageStore()
   
-  async function verifyImagePermissions( refreshScreenHandler?: () => void ){
-    if (cameraPermissionInformation?.status === PermissionStatus.UNDETERMINED) {
-      const permissionResponse = await requestPermission()
-      return permissionResponse.granted
-    }
-  
-    if (cameraPermissionInformation?.status === PermissionStatus.DENIED) {
-      Alert.alert(
-        "Insufficient Permissions!",
-        "The app needs access to your photos to help you save and manage your memories.",
-        [
-          { text: "Cancel", style: "cancel" },
-          { text: "Open Settings", onPress: () => {
-            Linking.openSettings()
-            if(refreshScreenHandler){
-              refreshScreenHandler()
-            }
-          } },
-        ]
-      )
-      setPemissionsAllowed(false)
-      return false
-    }
-
-    if (cameraPermissionInformation?.status === undefined) {
-      setIsMemoryListScreenUpdated(false)
-      return false
-    }
-    setPemissionsAllowed(true)
-    return true
-  }
-
   async function selectAndAddImage(
     memoryId? : Memory['id']
   ){
@@ -83,7 +45,6 @@ export function useImages(){
   }
 
   return {
-    verifyImagePermissions,
     selectAndAddImage
   }
 }

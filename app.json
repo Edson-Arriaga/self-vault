@@ -15,7 +15,6 @@
     },
     "android": {
       "package": "com.edsonarri20.selfvault",
-      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/self-vault-adaptive-icon.png",
         "backgroundColor": "#FEFAE0"

@@ -40,6 +40,7 @@ export default function MemoryCard({mem, setIsDeleteModalActive, setActiveId} : 
       <View className="border-y-8 border-r-8 flex-1 border-transparent">
         <Pressable 
           className="flex-1 h-28 bg-lightCream/75 border-y-4 border-r-4 border-aqua/75 rounded-r-xl shadow-black shadow-md"
+          android_ripple={{color: Colors.gray, foreground: true}}
           onPress={displayMemoryHandler}
         >
           <View className="flex-1 border-y-4 border-r-4 border-coral/50 p-3 flex-row justify-between rounded-br-md rounded-tr-md">

@@ -20,13 +20,15 @@ import { getFavsAndOthers } from './db/favsAndOthers';
 import DisplayMemoryScreen from './screens/DisplayMemoryScreen';
 import MemoryListScreen from './screens/MemoryListScreen';
 import FavAndOtherListScreen from './screens/FavAndOtherListScreen';
-import * as FileSystem from 'expo-file-system';
+import 'react-native-reanimated'
+import 'react-native-gesture-handler'
 
 const stackScreenOptions : NativeStackNavigationOptions = {
   headerShown: false,
   headerStyle: { backgroundColor: Colors.aqua },
   headerTintColor: Colors.lightCream,
-  contentStyle: { backgroundColor: Colors.cream }
+  contentStyle: { backgroundColor: Colors.cream },
+  animation: 'slide_from_right'
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>()

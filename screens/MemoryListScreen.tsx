@@ -12,7 +12,6 @@ import DeleteMemoryModal from "../components/memories/DeleteMemoryModal";
 import { useImageStore } from "../stores/imageStore";
 import CategoryHeader from "../components/ui/CategoryHeader";
 import BottomButton from "../components/ui/BottomButton";
-import { useIsFocused } from "@react-navigation/native";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MemoryListScreen'>
 
@@ -21,7 +20,7 @@ export default function MemoryListScreen({route, navigation} : Props) {
 
   const category = Object.values(Sections).flat().find((cat) => cat.id === categoryId)
   
-  const { isImageModalActive, permissionsAllowed, setIsMemoryListScreenUpdated, isMemoryListScreenUpdated } = useImageStore()
+  const { isImageModalActive } = useImageStore()
 
   const [activeId, setActiveId] = useState<Memory['id']>() 
   const [isDeleteModalActive, setIsDeleteModalActive] = useState(false)
@@ -44,16 +43,6 @@ export default function MemoryListScreen({route, navigation} : Props) {
     }
     getAllMemories()
   }, [memories])
-
-  const isFocus = useIsFocused()
-  
-  //Refresh the screen if the permission has been updated from another screen
-  useEffect(() => {
-    if(!isMemoryListScreenUpdated && permissionsAllowed && isFocus){
-      setIsMemoryListScreenUpdated(true)
-      navigation.replace('MemoryListScreen', { categoryId })
-    }
-  }, [isMemoryListScreenUpdated, permissionsAllowed, isFocus])
 
   useEffect(() => {
     navigation.setOptions({

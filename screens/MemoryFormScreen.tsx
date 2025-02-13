@@ -31,7 +31,7 @@ export default function MemoryFormScreen({navigation, route} : Props) {
   })
 
   const { addMemoryLocal, updateMemoryLocal } = useMemoryStore()
-  const {selectAndAddImage, verifyImagePermissions} = useImages()
+  const { selectAndAddImage } = useImages()
   
   const categoryName = route.params.categoryName
   const selectedEditId = route.params.selectedEditId
@@ -67,14 +67,10 @@ export default function MemoryFormScreen({navigation, route} : Props) {
   }, [navigation])
    
   const pickImageHandler = async () => {
-    const hasPermission = await verifyImagePermissions(refreshScreenHandler)
-
-    if(hasPermission){
-      const result = await selectAndAddImage()
-      if(!result?.canceled){
-        setData(prev => ({...prev, imageUri: result?.temporalUri!}))
-        setIsDeleteImageIconActive(true)
-      }
+    const result = await selectAndAddImage()
+    if(!result?.canceled){
+      setData(prev => ({...prev, imageUri: result?.temporalUri!}))
+      setIsDeleteImageIconActive(true)
     }
   }
 
@@ -165,12 +161,6 @@ export default function MemoryFormScreen({navigation, route} : Props) {
 
   function selectDayHandler(){
     setIsActiveCalendar(prev => !prev)
-  }
-
-  function refreshScreenHandler(){
-    setTimeout(() => {
-      navigation.replace('MemoryFormScreen', {categoryName, selectedEditId}) 
-    }, 500)
   }
   
   return (
