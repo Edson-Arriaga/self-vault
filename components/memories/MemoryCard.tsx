@@ -9,7 +9,7 @@ import ImageButton from "./ImageButton";
 type MemorieCardProps = {
   mem: Memory
   setIsDeleteModalActive: React.Dispatch<React.SetStateAction<boolean>>
-  setActiveId: React.Dispatch<React.SetStateAction<number | undefined>>
+  setActiveId: React.Dispatch<React.SetStateAction<Memory['id']>>
 }
 
 export default function MemoryCard({mem, setIsDeleteModalActive, setActiveId} : MemorieCardProps) {

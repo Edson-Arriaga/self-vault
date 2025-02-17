@@ -37,15 +37,16 @@ export async function addFavAndOther(favAndOther: FavAndOther){
   
   try {
     const result = FavAndOtherSchema.safeParse(favAndOther)
+
     if(!result.success){
       return { error: true, message: 'Error adding entry' }
     }
 
-    const response = await db.runAsync('INSERT INTO favsAndOthers (entry, category, section) VALUES (?, ?, ?)', 
-      favAndOther.entry, favAndOther.category, favAndOther.section
+    await db.runAsync('INSERT INTO favsAndOthers (id, entry, category, section) VALUES (?, ?, ?, ?)', 
+      favAndOther.id!, favAndOther.entry, favAndOther.category, favAndOther.section
     )
 
-    return {id: response.lastInsertRowId, error: false}
+    return {error: false}
 
   } catch (error) {
     return { error: true, message: 'Error adding entry' }

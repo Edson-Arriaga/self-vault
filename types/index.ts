@@ -1,7 +1,7 @@
 import {z} from 'zod'
 
 export const MemorySchema = z.object({
-  id: z.number().optional(),
+  id: z.string().optional(),
   title: z.string().trim().min(1).max(55),
   description: z.string().trim().min(1).max(1500),
   category: z.string().min(1),
@@ -17,7 +17,7 @@ export type Memory = z.infer<typeof MemorySchema>
 export type MemoryForm = Pick<Memory, 'title' | 'description' | 'date' | 'imageUri'>
 
 export const FavAndOtherSchema = z.object({
-  id: z.number().optional(),
+  id: z.string().optional(),
   entry: z.string().trim().min(1).max(150),
   section: z.string().min(1),
   category: z.string().min(1),

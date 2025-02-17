@@ -8,7 +8,7 @@ type MemorieCardProps = {
   fao: FavAndOther
   setIsEntryDetailsModalActive: React.Dispatch<React.SetStateAction<boolean>>
   setIsDeleteModalActive: React.Dispatch<React.SetStateAction<boolean>>
-  setActiveFavAndOtherId: React.Dispatch<React.SetStateAction<number | undefined>>
+  setActiveFavAndOtherId: React.Dispatch<React.SetStateAction<FavAndOther['id']>>
 }
 
 export default function FavAndOtherCard({fao, setIsEntryDetailsModalActive, setIsDeleteModalActive, setActiveFavAndOtherId} : MemorieCardProps) {

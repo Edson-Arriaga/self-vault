@@ -8,12 +8,14 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { Colors } from "../constants/Colors";
 import AppCalendar from "../components/memories/AppCalendar";
 import { addMemory, getMemoryById, updateMemory } from "../db/memories";
-import { Memory, MemoryForm } from "../types";
+import { MemoryForm } from "../types";
 import { useMemoryStore } from "../stores/memoryStore";
 import Toast from "react-native-toast-message";
 import BottomButton from "../components/ui/BottomButton";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useImages } from "../hooks/useImages";
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MemoryFormScreen'>;
 
@@ -21,8 +23,11 @@ export default function MemoryFormScreen({navigation, route} : Props) {
 
   const [prevData, setPrevData] = useState<MemoryForm>()
   const [isDeleteImageIconActive, setIsDeleteImageIconActive] = useState(false)
-  
   const [isActiveCalendar, setIsActiveCalendar] = useState(false)
+  
+  const categoryName = route.params.categoryName
+  const selectedEditId = route.params.selectedEditId
+  
   const [data, setData] = useState<MemoryForm>({
     title: '',
     date: '',
@@ -32,26 +37,23 @@ export default function MemoryFormScreen({navigation, route} : Props) {
 
   const { addMemoryLocal, updateMemoryLocal } = useMemoryStore()
   const { selectAndAddImage } = useImages()
-  
-  const categoryName = route.params.categoryName
-  const selectedEditId = route.params.selectedEditId
 
   const isEditModeEnabled = selectedEditId !== undefined
 
   useEffect(() => {
     async function getMemory(){
-      const favAndOther = await getMemoryById(selectedEditId)
+      const memory = await getMemoryById(selectedEditId)
       
-      const favAndOtherdata : MemoryForm = {
-        title: favAndOther.data.title,
-        description: favAndOther.data.description,
-        date: favAndOther.data.date,
-        imageUri: favAndOther.data.imageUri
+      const memoryData : MemoryForm = {
+        title: memory.data.title,
+        description: memory.data.description,
+        date: memory.data.date,
+        imageUri: memory.data.imageUri
       }
 
-      setPrevData(favAndOtherdata)
-      setData(favAndOtherdata)
-      setIsDeleteImageIconActive(!!favAndOtherdata.imageUri)
+      setPrevData(memoryData)
+      setData(memoryData)
+      setIsDeleteImageIconActive(!!memoryData.imageUri)
     }
     if(isEditModeEnabled){
       getMemory()
@@ -126,20 +128,20 @@ export default function MemoryFormScreen({navigation, route} : Props) {
       })
 
     } else {
-      const dataWithCategory : Memory = {
+      const completeData = {
         ...data,
-        category: categoryName!
+        id: uuidv4(),
+        category: categoryName!,
       }
-  
-      const response = await addMemory(dataWithCategory)
-   
+
+      const response = await addMemory(completeData)
+
       if(response.error) {
         navigation.navigate('ErrorScreen')
         return
       }
 
-      const dataWithId = {...dataWithCategory, id: response.id}
-      addMemoryLocal(dataWithId)
+      addMemoryLocal(completeData)
 
       Toast.show({
         type: 'success',
@@ -167,13 +169,13 @@ export default function MemoryFormScreen({navigation, route} : Props) {
     <View className="flex-1">
       <BgGradient />
       <ScrollView contentContainerStyle={{ flexGrow: 1, minHeight: '100%', width: '100%' }} scrollEnabled>
-      <Text className="font-primary-bold text-5xl text-gray mb-6 pt-5 mt-12 text-center">
-        {isEditModeEnabled ? 'Edit Memory' : 'Add Memory'}
-      </Text>
+          <Text className="font-primary-bold text-5xl text-gray mb-6 pt-5 mt-12 text-center">
+            {isEditModeEnabled ? 'Edit Memory' : 'Add Memory'}
+          </Text>
       
         <View className="flex-1 justify-between">
           <View className="px-2 flex-1">
-            <View className="bg-white flex-1 h-grow px-5 mb-5 rounded-2xl overflow-hidden w-full max-w-xl mx-auto">
+            <View className="bg-white flex-1 px-5 mb-5 rounded-2xl overflow-hidden w-full max-w-xl mx-auto">
               <View className="flex-row justify-between mt-4 border-b-4 border-gray pb-4 rounded-xl">
 
                 <View className="flex-row items-center gap-1">
@@ -248,7 +250,9 @@ export default function MemoryFormScreen({navigation, route} : Props) {
             </View>
           </View>
 
-          <BottomButton onPress={actionMemoryHandler}>{isEditModeEnabled ? 'Save Changes' : 'Add Memory'}</BottomButton>
+          <BottomButton onPress={actionMemoryHandler}>
+            {isEditModeEnabled ? 'Save Changes' : 'Add Memory'}
+          </BottomButton>
         </View>
       </ScrollView>
     </View>

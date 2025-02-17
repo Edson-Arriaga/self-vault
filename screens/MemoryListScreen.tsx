@@ -67,7 +67,7 @@ export default function MemoryListScreen({route, navigation} : Props) {
           <FlatList
             scrollEnabled={false}
             data={data.filter(mem => mem.category === category?.name)}
-            keyExtractor={mem => mem.id?.toString()!}
+            keyExtractor={mem => mem.id!}
             contentContainerStyle={{
               marginVertical: 36, 
               marginLeft: 10,

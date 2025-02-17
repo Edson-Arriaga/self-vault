@@ -66,7 +66,7 @@ export default function FavAndOtherListScreen({route, navigation} : Props) {
             <FlatList
               scrollEnabled={false}
               data={data.filter(fao => fao.category === category?.name)}
-              keyExtractor={mem => mem.id?.toString()!}
+              keyExtractor={mem => mem.id!}
               contentContainerStyle={{
                 marginVertical: 16, 
                 marginHorizontal: 10,

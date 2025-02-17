@@ -10,7 +10,7 @@ export async function initDB(){
   try {
     db.execAsync(`
       CREATE TABLE IF NOT EXISTS memories (
-        id INTEGER PRIMARY KEY NOT NULL,
+        id INTEGER NOT NULL,
         title TEXT NOT NULL, 
         description TEXT NOT NULL, 
         category TEXT NOT NULL,
@@ -20,7 +20,7 @@ export async function initDB(){
       );
       
       CREATE TABLE IF NOT EXISTS favsAndOthers (
-        id INTEGER PRIMARY KEY NOT NULL,
+        id INTEGER NOT NULL,
         entry TEXT NOT NULL,
         category TEXT NOT NULL,
         section TEXT NOT NULL,

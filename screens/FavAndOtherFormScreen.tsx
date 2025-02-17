@@ -8,7 +8,8 @@ import { addFavAndOther, updateFavAndOther, getFavAndOtherById } from "../db/fav
 import { FavAndOther } from "../types";
 import { useFavAndOtherStore } from "../stores/favAndOtherStore";
 import BottomButton from "../components/ui/BottomButton";
-
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'FavAndOtherFormScreen'>
 
@@ -69,6 +70,7 @@ export default function FavAndOtherFormScreen({navigation, route} : Props) {
       })
     } else {
       const data : FavAndOther = {
+        id: uuidv4(),
         entry,
         category: categoryName!,
         section: sectionName!
@@ -81,8 +83,7 @@ export default function FavAndOtherFormScreen({navigation, route} : Props) {
         return
       }
   
-      const dataWithId = {...data, id: response.id}
-      addFavAndOtherLocal(dataWithId)
+      addFavAndOtherLocal(data)
 
       Toast.show({
         type: 'success',

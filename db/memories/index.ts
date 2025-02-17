@@ -42,11 +42,11 @@ export async function addMemory(mem: Memory){
       return { error: true, message: 'Error adding memory' }
     }
 
-    const response = await db.runAsync('INSERT INTO memories (title, description, category, date, imageUri) VALUES (?, ?, ?, ?, ?)', 
-      mem.title, mem.description, mem.category, mem.date, mem.imageUri
+    await db.runAsync('INSERT INTO memories (id, title, description, category, date, imageUri) VALUES (?, ?, ?, ?, ?, ?)', 
+      mem.id!, mem.title, mem.description, mem.category, mem.date, mem.imageUri
     )
 
-    return {id: response.lastInsertRowId, error: false }
+    return { error: false }
 
   } catch (error) {
     return { error: true, message: 'Error adding memory' }

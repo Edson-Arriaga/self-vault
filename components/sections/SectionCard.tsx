@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Image, Pressable, Text, View } from "react-native";
 import { Category, SectionNames } from "../../constants/Sections";
 import { Colors } from "../../constants/Colors";
+import { MotiView } from "moti";
 
 export default function SectionCard({category, sectionName} : {category : Category, sectionName: SectionNames}) {
   
@@ -16,20 +17,31 @@ export default function SectionCard({category, sectionName} : {category : Catego
   }
   
   return (
-    <View className="w-36 h-48 m-3 rounded-xl overflow-hidden">
+    <View className="w-36 h-48 m-3 rounded-xl">
       <Pressable 
         className="border-gray"
         android_ripple={{foreground: true, color: Colors.gray}}
         onPress={() => onPressHandler(category.id)}
       >
-        <View className="h-2/3 border-aqua rounded-t-xl overflow-hidden border-x-2 border-t-2">
-          <Image className="size-full" source={category.image}/>
-        </View>
-        <View className="h-1/3 bg-lightCream border-coral/75 border-4 rounded-b-lg">
-          <View className="border-coral/50 border-2 flex-1 justify-center rounded-b-sm">
-            <Text className="font-primary-semibold text-center text-sm pt-1" key={category.id}>{category.name}</Text>
+        {/* <MotiView
+          from={{
+            scale: 0.5,
+            translateX: -200
+          }}
+          animate={{
+            scale: 1,
+            translateX: 0
+          }}
+        > */}
+          <View className="h-2/3 border-aqua rounded-t-xl overflow-hidden border-x-2 border-t-2">
+            <Image className="size-full" source={category.image}/>
           </View>
-        </View>
+          <View className="h-1/3 bg-lightCream border-coral/75 border-4 rounded-b-lg">
+            <View className="border-coral/50 border-2 flex-1 justify-center rounded-b-sm">
+              <Text className="font-primary-semibold text-center text-sm pt-1" key={category.id}>{category.name}</Text>
+            </View>
+          </View>
+        {/* </MotiView> */}
       </Pressable>
     </View>
   )

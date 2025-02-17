@@ -14,7 +14,7 @@ import { getMemories } from './db/memories';
 import Toast from 'react-native-toast-message';
 import { useMemoryStore } from './stores/memoryStore';
 import FavAndOtherFormScreen from './screens/FavAndOtherFormScreen';
-import { initDB } from './db';
+import { cleanDB, initDB } from './db';
 import { useFavAndOtherStore } from './stores/favAndOtherStore';
 import { getFavsAndOthers } from './db/favsAndOthers';
 import DisplayMemoryScreen from './screens/DisplayMemoryScreen';
@@ -22,6 +22,7 @@ import MemoryListScreen from './screens/MemoryListScreen';
 import FavAndOtherListScreen from './screens/FavAndOtherListScreen';
 import 'react-native-reanimated'
 import 'react-native-gesture-handler'
+import { deleteAsync, documentDirectory, readDirectoryAsync } from 'expo-file-system';
 
 const stackScreenOptions : NativeStackNavigationOptions = {
   headerShown: false,
@@ -57,13 +58,13 @@ export default function App() {
       setMemories(resMem.data)
       setFavsAndOthers(resFao.data)
       
-      //const directory = FileSystem.documentDirectory
-      //const files = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory!)
-      //console.log('Archivos almacenados:', files)
+      // const directory = documentDirectory
+      // const files = await readDirectoryAsync(documentDirectory!)
+      // console.log('Archivos almacenados:', files)
 
-      //await cleanDB()
+      // await cleanDB()
       // for (const file of files) {
-      //   await FileSystem.deleteAsync(directory + file);
+      //   await deleteAsync(directory + file);
       // }
       
       setisDBReady(true)

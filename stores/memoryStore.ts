@@ -6,7 +6,7 @@ interface MemoryState {
   setMemories: (memories : Memory[]) => void,
   addMemoryLocal: (mem: Memory) => void 
   deleteMemoryLocal: (memId: Memory['id']) => void 
-  updateMemoryLocal: (memId: number, data: Partial<Memory>) => void
+  updateMemoryLocal: (memId: Memory['id'], data: Partial<Memory>) => void
   addImageLocal: (memId: Memory['id'], imageUri : string) => void
 }
 
