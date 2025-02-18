@@ -14,8 +14,9 @@ import Toast from "react-native-toast-message";
 import BottomButton from "../components/ui/BottomButton";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useImages } from "../hooks/useImages";
-import 'react-native-get-random-values';
+import 'react-native-get-random-values'
 import { v4 as uuidv4 } from 'uuid';
+import * as Animatable from 'react-native-animatable';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MemoryFormScreen'>;
 
@@ -84,7 +85,7 @@ export default function MemoryFormScreen({navigation, route} : Props) {
       Toast.show({
         type: 'error',
         text1: 'Invalid Fields.',
-        text2: 'Please fill all the fields.'
+        text2: 'Please fill in at least the Title and Description fields.'
       })
       return
     }
@@ -169,17 +170,20 @@ export default function MemoryFormScreen({navigation, route} : Props) {
     <View className="flex-1">
       <BgGradient />
       <ScrollView contentContainerStyle={{ flexGrow: 1, minHeight: '100%', width: '100%' }} scrollEnabled>
-          <Text className="font-primary-bold text-5xl text-gray mb-6 pt-5 mt-12 text-center">
-            {isEditModeEnabled ? 'Edit Memory' : 'Add Memory'}
-          </Text>
-      
+        <Text className="font-primary-bold text-5xl text-gray mb-6 pt-5 mt-12 text-center">
+          {isEditModeEnabled ? 'Edit Memory' : 'Add Memory'}
+        </Text>
+    
         <View className="flex-1 justify-between">
-          <View className="px-2 flex-1">
-            <View className="bg-white flex-1 px-5 mb-5 rounded-2xl overflow-hidden w-full max-w-xl mx-auto">
+          <View className="px-2">
+            <View className="bg-white px-5 mb-5 rounded-2xl overflow-hidden w-full max-w-xl mx-auto pb-10">
               <View className="flex-row justify-between mt-4 border-b-4 border-gray pb-4 rounded-xl">
-
                 <View className="flex-row items-center gap-1">
-                  <Pressable onPress={selectDayHandler}>
+                    <Pressable
+                      onPress={selectDayHandler}
+                      className="rounded-lg overflow-hidden"
+                      android_ripple={{color: Colors.gray, foreground: true}}
+                    >
                     <AntDesign name="calendar" size={40} color={Colors.gray} />
                   </Pressable>
 
@@ -199,7 +203,11 @@ export default function MemoryFormScreen({navigation, route} : Props) {
                     </Pressable>
                   )}
 
-                  <Pressable onPress={pickImageHandler}>
+                  <Pressable
+                    onPress={pickImageHandler}
+                    className="rounded-xl overflow-hidden"
+                    android_ripple={{color: Colors.gray, foreground: true}}
+                  >
                     {data.imageUri ? (
                       <View className="size-11 rounded-lg overflow-hidden">
                         <Image className="size-full" source={{uri: data.imageUri}}/> 
@@ -217,7 +225,11 @@ export default function MemoryFormScreen({navigation, route} : Props) {
                     <AppCalendar date={data.date} setData={setData} />
                   </View>
                   {data.date && (
-                    <Pressable onPress={deleteDateHandler}>
+                    <Pressable
+                      onPress={deleteDateHandler}
+                      className="rounded-xl overflow-hidden"
+                      android_ripple={{color: Colors.gray, foreground: true}}
+                    >
                       <Ionicons name="trash-bin" size={40} color={Colors.red} />
                     </Pressable>
                   )}

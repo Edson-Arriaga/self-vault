@@ -25,8 +25,6 @@ export default function MemoryListScreen({route, navigation} : Props) {
   const [activeId, setActiveId] = useState<Memory['id']>() 
   const [isDeleteModalActive, setIsDeleteModalActive] = useState(false)
 
-  const [data, setData] = useState<Memory[]>([])
- 
   const {memories} = useMemoryStore()
 
   if(!category){
@@ -36,13 +34,6 @@ export default function MemoryListScreen({route, navigation} : Props) {
   function addEntryHandler(){
     navigation.navigate('MemoryFormScreen', {categoryName: category!.name, selectedEditId: undefined})
   }
-
-  useEffect(() => {
-    async function getAllMemories(){
-      setData(memories)
-    }
-    getAllMemories()
-  }, [memories])
 
   useEffect(() => {
     navigation.setOptions({
@@ -58,7 +49,7 @@ export default function MemoryListScreen({route, navigation} : Props) {
       <ScrollView>
         <View>
           <CategoryHeader category={category!}/>
-         {data.filter(mem => mem.category === category?.name).length === 0 ? (
+         {memories.filter(mem => mem.category === category?.name).length === 0 ? (
             <View className="my-10 mx-10">
               <Text className="font-primary-semibold text-center text-xl text-gray">No memories yet.</Text>
               <Text className="font-primary-semibold text-center text-xl text-gray">Add one to see your list here 🤗</Text>
@@ -66,24 +57,23 @@ export default function MemoryListScreen({route, navigation} : Props) {
          ) : (
           <FlatList
             scrollEnabled={false}
-            data={data.filter(mem => mem.category === category?.name)}
+            data={memories.filter(mem => mem.category === category?.name)}
             keyExtractor={mem => mem.id!}
             contentContainerStyle={{
               marginVertical: 36, 
               marginLeft: 10,
               gap: 16
             }}
-            renderItem={({item}) => (
+            renderItem={({item, index}) => (
               <MemoryCard 
                 mem={item}
+                i={index}
                 setIsDeleteModalActive={setIsDeleteModalActive}
                 setActiveId={setActiveId}
               />
             )}
           />
          )}
-          
-          
         </View>
       </ScrollView>
       

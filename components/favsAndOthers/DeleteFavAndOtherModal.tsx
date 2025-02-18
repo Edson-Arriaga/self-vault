@@ -5,12 +5,12 @@ import { deleteFavAndOther } from "../../db/favsAndOthers";
 import { useFavAndOtherStore } from "../../stores/favAndOtherStore";
 import { useNavigation } from "@react-navigation/native";
 
-type ImageModal = {
+type DeleteFavAndOtherModalProps = {
   favAndOtherId: FavAndOther['id']
   setModalStatus: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function DeleteFavAndOtherModal({favAndOtherId, setModalStatus} : ImageModal) {
+export default function DeleteFavAndOtherModal({favAndOtherId, setModalStatus} : DeleteFavAndOtherModalProps) {
   
   const {deleteFavAndOtherLocal} = useFavAndOtherStore()
 
@@ -32,5 +32,5 @@ export default function DeleteFavAndOtherModal({favAndOtherId, setModalStatus} :
     })
   }
   
-  return <DeleteModalContent  deleteHandler={deleteMemorieHandler} setModalStatus={setModalStatus}/>
+  return <DeleteModalContent deleteHandler={deleteMemorieHandler} setModalStatus={setModalStatus}/>
 }

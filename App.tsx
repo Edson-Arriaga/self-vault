@@ -20,8 +20,6 @@ import { getFavsAndOthers } from './db/favsAndOthers';
 import DisplayMemoryScreen from './screens/DisplayMemoryScreen';
 import MemoryListScreen from './screens/MemoryListScreen';
 import FavAndOtherListScreen from './screens/FavAndOtherListScreen';
-import 'react-native-reanimated'
-import 'react-native-gesture-handler'
 import { deleteAsync, documentDirectory, readDirectoryAsync } from 'expo-file-system';
 
 const stackScreenOptions : NativeStackNavigationOptions = {

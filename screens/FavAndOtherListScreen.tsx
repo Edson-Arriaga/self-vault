@@ -20,14 +20,13 @@ export default function FavAndOtherListScreen({route, navigation} : Props) {
   
   const category = Object.values(Sections).flat().find((cat) => cat.id === categoryId)
 
-  const [data, seData] = useState<FavAndOther[]>([])
+  const {favsAndOthers} = useFavAndOtherStore()
   
   const [activeFavAndOtherId, setActiveFavAndOtherId] = useState<FavAndOther['id']>()
   const [isEntryDetailsModalActive, setIsEntryDetailsModalActive] = useState(false)
   
   const [isDeleteModalActive, setIsDeleteModalActive] = useState(false)
 
-  const {favsAndOthers} = useFavAndOtherStore()
 
   if(!category){
     navigation.navigate('ErrorScreen')
@@ -36,13 +35,6 @@ export default function FavAndOtherListScreen({route, navigation} : Props) {
   function addEntryHandler(){
     navigation.navigate('FavAndOtherFormScreen', {categoryName: category!.name, sectionName, selectedEditId: undefined})
   }
-
-  useEffect(() => {
-    async function getAllFavsAndOthers(){
-      seData(favsAndOthers)
-    }
-    getAllFavsAndOthers()
-  }, [favsAndOthers])
 
   useEffect(() => {
     navigation.setOptions({
@@ -57,7 +49,7 @@ export default function FavAndOtherListScreen({route, navigation} : Props) {
       <ScrollView>
         <View>
           <CategoryHeader category={category!}/>
-          {data.filter(mem => mem.category === category?.name).length === 0 ? (
+          {favsAndOthers.filter(fao => fao.category === category?.name).length === 0 ? (
             <View className="my-10 mx-10">
               <Text className="font-primary-semibold text-center text-xl text-gray">No entries yet.</Text>
               <Text className="font-primary-semibold text-center text-xl text-gray">Add one to see your list here 🤗</Text>
@@ -65,16 +57,17 @@ export default function FavAndOtherListScreen({route, navigation} : Props) {
           ) : (
             <FlatList
               scrollEnabled={false}
-              data={data.filter(fao => fao.category === category?.name)}
+              data={favsAndOthers.filter(fao => fao.category === category?.name)}
               keyExtractor={mem => mem.id!}
               contentContainerStyle={{
                 marginVertical: 16, 
                 marginHorizontal: 10,
                 gap: 16
               }}
-              renderItem={({item}) => (
+              renderItem={({item, index}) => (
                 <FavAndOtherCard
                   fao={item}
+                  i={index}
                   setIsEntryDetailsModalActive={setIsEntryDetailsModalActive}
                   setIsDeleteModalActive={setIsDeleteModalActive}
                   setActiveFavAndOtherId={setActiveFavAndOtherId}

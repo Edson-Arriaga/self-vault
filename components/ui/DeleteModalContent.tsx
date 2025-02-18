@@ -1,5 +1,6 @@
 import React from 'react'
 import { Pressable, Text, View } from 'react-native'
+import * as Animatable from 'react-native-animatable';
 
 type DeleteModalContentProps = {
   deleteHandler(): Promise<void>
@@ -14,7 +15,7 @@ export default function DeleteModalContent({deleteHandler, setModalStatus} : Del
   
   return (
     <View className="justify-center items-center absolute inset-0 bg-black/80 z-50">
-      <View className="bg-lightCream border-4 border-coral rounded-xl mx-3">
+      <Animatable.View animation={'bounceIn'} className='bg-lightCream border-4 border-coral rounded-xl mx-3'>
         <View className="gap-8 rounded-lg border-2 border-coral/50 p-5">
           <Text className="font-primary-semibold text-2xl text-gray">Are you sure you want to delete this item?</Text>
           <View className="flex-row justify-evenly gap-5">
@@ -26,7 +27,7 @@ export default function DeleteModalContent({deleteHandler, setModalStatus} : Del
             </Pressable>
           </View>
         </View>
-      </View>
+      </Animatable.View>
     </View>
   )
 }

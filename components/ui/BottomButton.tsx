@@ -5,7 +5,6 @@ type BottomButtonProps = {
   children: React.ReactNode
 }
 
-
 export default function BottomButton({onPress, children} : BottomButtonProps) {
   return (
     <Pressable 

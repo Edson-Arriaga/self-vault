@@ -5,12 +5,12 @@ import Toast from "react-native-toast-message";
 import DeleteModalContent from "../ui/DeleteModalContent";
 import { useNavigation } from "@react-navigation/native";
 
-type ImageModal = {
+type DeleteMemoryModalProps = {
   memoryId: Memory['id']
   setModalStatus: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function DeleteMemoryModal({memoryId, setModalStatus} : ImageModal) {
+export default function DeleteMemoryModal({memoryId, setModalStatus} : DeleteMemoryModalProps) {
   
   const {deleteMemoryLocal} = useMemoryStore()
 
