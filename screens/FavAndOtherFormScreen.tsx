@@ -82,7 +82,7 @@ export default function FavAndOtherFormScreen({navigation, route} : Props) {
         navigation.navigate('ErrorScreen')
         return
       }
-  
+      
       addFavAndOtherLocal(data)
 
       Toast.show({

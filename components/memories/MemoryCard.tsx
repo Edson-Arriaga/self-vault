@@ -7,6 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 import ImageButton from "./ImageButton";
 import * as Animatable from 'react-native-animatable';
 import { useRef } from "react";
+import { useMemoryStore } from "../../stores/memoryStore";
 
 type MemoryCardProps = {
   mem: Memory,
@@ -18,6 +19,7 @@ type MemoryCardProps = {
 export default function MemoryCard({mem, i, setIsDeleteModalActive, setActiveId} : MemoryCardProps) {
 
   const navigation = useNavigation()
+  const {setMemoryDeletedRef} = useMemoryStore() 
   const deleteIconRef = useRef<Animatable.View>(null)
   const updateIconRef = useRef<Animatable.View>(null)
   const cardRef = useRef<Animatable.View>(null)
@@ -27,6 +29,7 @@ export default function MemoryCard({mem, i, setIsDeleteModalActive, setActiveId}
     setTimeout(() => {
       setActiveId(mem.id)
       setIsDeleteModalActive(true)
+      setMemoryDeletedRef(cardRef)
     }, 50)
   }
 
@@ -68,7 +71,7 @@ export default function MemoryCard({mem, i, setIsDeleteModalActive, setActiveId}
             </View>
 
             <View className="items-center justify-between -my-1">
-              <Pressable onPress={deleteMemorieHandler}>
+              <Pressable onPress={deleteMemorieHandler} className="ml-1">
                 <Animatable.View ref={deleteIconRef}>
                   <Ionicons name="trash-bin" size={34} color={Colors.coral} />
                 </Animatable.View>

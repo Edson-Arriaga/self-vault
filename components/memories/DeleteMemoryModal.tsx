@@ -15,7 +15,8 @@ export default function DeleteMemoryModal({memoryId, setModalStatus} : DeleteMem
   const {deleteMemoryLocal} = useMemoryStore()
 
   const navigation = useNavigation()
-  
+  const {setMemoryDeletedRef, memoryDeletedRef} = useMemoryStore()
+
   async function deleteMemorieHandler(){
     const response = await deleteMemory(memoryId)
 
@@ -24,11 +25,13 @@ export default function DeleteMemoryModal({memoryId, setModalStatus} : DeleteMem
       return
     }
 
-    deleteMemoryLocal(memoryId)
     setModalStatus(false)
+    await memoryDeletedRef?.current?.animate('bounceOut', 700)
+    setMemoryDeletedRef(null)
+    deleteMemoryLocal(memoryId)
     Toast.show({
       type: 'success',
-      text1: '✅ Memory Deleted Succesfully.'
+      text1: '✅ Item Deleted Succesfully.'
     })
   }
   

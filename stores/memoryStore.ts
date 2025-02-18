@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { Memory } from '../types'
+import * as Animatable from 'react-native-animatable';
 
 interface MemoryState {
   memories: Memory[],
@@ -7,7 +8,9 @@ interface MemoryState {
   addMemoryLocal: (mem: Memory) => void 
   deleteMemoryLocal: (memId: Memory['id']) => void 
   updateMemoryLocal: (memId: Memory['id'], data: Partial<Memory>) => void
-  addImageLocal: (memId: Memory['id'], imageUri : string) => void
+  addImageLocal: (memId: Memory['id'], imageUri : string) => void,
+  memoryDeletedRef: React.RefObject<Animatable.View> | null,
+  setMemoryDeletedRef: (ref: React.RefObject<Animatable.View> | null) => void,
 }
 
 export const useMemoryStore = create<MemoryState>()((set, get) => ({
@@ -20,5 +23,7 @@ export const useMemoryStore = create<MemoryState>()((set, get) => ({
   })),
   addImageLocal: (memId, imageUri) => set(() => ({
     memories: get().memories.map(mem => mem.id === memId ? {...mem, imageUri } : mem)
-  }))
+  })),
+  memoryDeletedRef: null,
+  setMemoryDeletedRef: (memoryDeletedRef) => set(() => ({memoryDeletedRef}))
 }))

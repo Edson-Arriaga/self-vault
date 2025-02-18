@@ -15,6 +15,7 @@ export default function DeleteFavAndOtherModal({favAndOtherId, setModalStatus} :
   const {deleteFavAndOtherLocal} = useFavAndOtherStore()
 
   const navigation = useNavigation()
+  const {favAndOtherDeletedRef, setFavAndOtherDeletedRef} = useFavAndOtherStore()
   
   async function deleteMemorieHandler(){
     const response = await deleteFavAndOther(favAndOtherId)
@@ -24,8 +25,10 @@ export default function DeleteFavAndOtherModal({favAndOtherId, setModalStatus} :
       return
     }
 
-    deleteFavAndOtherLocal(favAndOtherId)
     setModalStatus(false)
+    await favAndOtherDeletedRef?.current?.animate('bounceOut', 700)
+    setFavAndOtherDeletedRef(null)
+    deleteFavAndOtherLocal(favAndOtherId)
     Toast.show({
       type: 'success',
       text1: '✅ Memory Deleted Succesfully.'

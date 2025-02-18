@@ -1,6 +1,8 @@
 import React from 'react'
 import { Pressable, Text, View } from 'react-native'
 import * as Animatable from 'react-native-animatable';
+import { useMemoryStore } from '../../stores/memoryStore';
+import { useFavAndOtherStore } from '../../stores/favAndOtherStore';
 
 type DeleteModalContentProps = {
   deleteHandler(): Promise<void>
@@ -9,8 +11,13 @@ type DeleteModalContentProps = {
 
 export default function DeleteModalContent({deleteHandler, setModalStatus} : DeleteModalContentProps) {
   
+  const {setMemoryDeletedRef} = useMemoryStore()
+  const {setFavAndOtherDeletedRef} = useFavAndOtherStore()
+  
   function cancelDeleteHandler(){
     setModalStatus(false)
+    setFavAndOtherDeletedRef(null)
+    setMemoryDeletedRef(null)
   }
   
   return (

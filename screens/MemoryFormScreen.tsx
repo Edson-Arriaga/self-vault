@@ -16,7 +16,6 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useImages } from "../hooks/useImages";
 import 'react-native-get-random-values'
 import { v4 as uuidv4 } from 'uuid';
-import * as Animatable from 'react-native-animatable';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MemoryFormScreen'>;
 

@@ -41,7 +41,7 @@ export async function addFavAndOther(favAndOther: FavAndOther){
     if(!result.success){
       return { error: true, message: 'Error adding entry' }
     }
-
+    console.log(favAndOther)
     await db.runAsync('INSERT INTO favsAndOthers (id, entry, category, section) VALUES (?, ?, ?, ?)', 
       favAndOther.id!, favAndOther.entry, favAndOther.category, favAndOther.section
     )
