@@ -20,6 +20,7 @@ import { getFavsAndOthers } from './db/favsAndOthers';
 import DisplayMemoryScreen from './screens/DisplayMemoryScreen';
 import MemoryListScreen from './screens/MemoryListScreen';
 import FavAndOtherListScreen from './screens/FavAndOtherListScreen';
+import { AppState } from 'react-native';
 import { deleteAsync, documentDirectory, readDirectoryAsync } from 'expo-file-system';
 
 const stackScreenOptions : NativeStackNavigationOptions = {
@@ -36,38 +37,47 @@ SplashScreen.preventAutoHideAsync()
 
 export default function App() {
   
-  const [isDBReady, setisDBReady] = useState(false)
+  const [dataIsReady, setDataIsReady] = useState(false)
   const {setMemories} = useMemoryStore()
   const {setFavsAndOthers} = useFavAndOtherStore()
 
   useEffect(() => {
-    async function initApp(){
-      await initDB()
+    const loadAppData = async () => {
       const resMem = await getMemories()
       const resFao = await getFavsAndOthers()
-      
-      if(resMem.error || resFao.error){
+      if (resMem.error || resFao.error) {
         Toast.show({
           type: 'error',
-          text1: 'Error fetching data'
+          text1: 'Error fetching data',
         })
       }
-
       setMemories(resMem.data)
       setFavsAndOthers(resFao.data)
-      
-      // const directory = documentDirectory
-      // const files = await readDirectoryAsync(documentDirectory!)
-      // console.log('Archivos almacenados:', files)
-
-      // await cleanDB()
-      // for (const file of files) {
-      //   await deleteAsync(directory + file);
-      // }
-      
-      setisDBReady(true)
+      setDataIsReady(true)
     }
-    initApp()
+
+    // const directory = documentDirectory
+    // const files = await readDirectoryAsync(documentDirectory!)
+    // console.log('Archivos almacenados:', files)
+    // await cleanDB()
+    // for (const file of files) {
+    //   await deleteAsync(directory + file);
+    // }
+
+    const handleAppStateChange = async (nextAppState: AppState['currentState']) => {
+      if (nextAppState === 'active') {
+        await loadAppData()
+      }
+    }
+
+    initDB()
+    loadAppData()
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange)
+    
+    return () => {
+      subscription.remove();
+    }
   }, [])
 
   const [loaded, error] = useFonts({
@@ -78,12 +88,12 @@ export default function App() {
   })
 
   useEffect(() => {
-    if ((loaded || error) && isDBReady) {
+    if ((loaded || error) && dataIsReady) {
       SplashScreen.hideAsync()
     }
-  }, [loaded, error, isDBReady])
+  }, [loaded, error, dataIsReady])
 
-  if (!loaded && !isDBReady) {
+  if (!loaded && !dataIsReady) {
     return null
   }
 

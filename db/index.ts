@@ -6,9 +6,8 @@ export async function useDB(){
 
 export async function initDB(){
   const db = await useDB()
-  
   try {
-    db.execAsync(`
+    await db.execAsync(`
       CREATE TABLE IF NOT EXISTS memories (
         id INTEGER NOT NULL,
         title TEXT NOT NULL, 
@@ -27,6 +26,7 @@ export async function initDB(){
         createdAt TEXT DEFAULT CURRENT_TIMESTAMP
       );
     `)
+    return { error: false }
   } catch (error) {
     return { error: true, message: 'Error initializing the database' }
   }
