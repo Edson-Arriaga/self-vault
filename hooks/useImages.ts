@@ -5,7 +5,7 @@ import { Memory } from "../types"
 import { useMemoryStore } from "../stores/memoryStore";
 
 export function useImages(){
-  const {addImageLocal} = useMemoryStore()
+  const { addImageLocal } = useMemoryStore()
   
   async function selectAndAddImage(
     memoryId? : Memory['id']
@@ -34,7 +34,7 @@ export function useImages(){
   
       const response = await addImage(memoryId, destinationUri)
   
-      if(response.error) return {error: true}
+      if(response?.error) return {error: true}
   
       addImageLocal(memoryId, destinationUri)
       

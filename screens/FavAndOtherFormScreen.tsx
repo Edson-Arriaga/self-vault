@@ -3,30 +3,29 @@ import BgGradient from "../components/ui/BgGradient";
 import { useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/navigation";
-import Toast from "react-native-toast-message";
 import { addFavAndOther, updateFavAndOther, getFavAndOtherById } from "../db/favsAndOthers";
-import { FavAndOther } from "../types";
+import { FavAndOther, FavAndOtherValidationForm } from "../types";
 import { useFavAndOtherStore } from "../stores/favAndOtherStore";
 import BottomButton from "../components/ui/BottomButton";
-import 'react-native-get-random-values'
-import { v4 as uuidv4 } from 'uuid';
+import Notification from "../components/ui/Notification";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'FavAndOtherFormScreen'>
 
 export default function FavAndOtherFormScreen({navigation, route} : Props) {
   
-  const { addFavAndOtherLocal, updateFavAndOtherLocal } = useFavAndOtherStore()
   const sectionName = route.params.sectionName 
   const categoryName = route.params.categoryName
   const selectedEditId = route.params.selectedEditId
-  
-  const isEditModeEnabled = selectedEditId !== undefined
-  
+
+  const { addFavAndOtherLocal, updateFavAndOtherLocal } = useFavAndOtherStore()
+ 
   const [entry, setEntry] = useState('')
+ 
+  const isEditModeEnabled = selectedEditId !== undefined
 
   useEffect(() => {
     async function getFavAndOther(){
-      const favAndOther = await getFavAndOtherById(selectedEditId)
+      const favAndOther = await getFavAndOtherById(selectedEditId!)
       setEntry(favAndOther.data.entry)
     }
     if(isEditModeEnabled){
@@ -35,60 +34,47 @@ export default function FavAndOtherFormScreen({navigation, route} : Props) {
   }, [])
 
   useEffect(() => {
-      navigation.setOptions({
-        headerShown: true,
-        title: ''
-      })
+      navigation.setOptions({ headerShown: true, title: '' })
   }, [navigation])
 
-
-  async function actionEntryHandler(){
-    const isEntryValid = entry.trim().length >= 1 && entry.trim().length <= 150
-  
-    if(!isEntryValid){
-      Toast.show({
-        type: 'error',
-        text1: 'Invalid Fields.',
-        text2: 'Please fill all the fields.'
-      })
+  async function actionHandler(){
+    /* VALIDATION */
+    const {data : validatedData, error} = FavAndOtherValidationForm.safeParse(entry)
+        
+    if(error){
+      Notification('error', 'Invalid Fields.', 'Please fill in at least the Title and Description fields.')
       return
     }
 
     if(isEditModeEnabled){
-      const response = await updateFavAndOther(selectedEditId, entry)
+      /* UPDATE DATA */
+      const response = await updateFavAndOther(selectedEditId, validatedData.entry)
 
-      if(response.error) {
+      if(response?.error) {
         navigation.navigate('ErrorScreen')
         return
       }
 
-      updateFavAndOtherLocal(selectedEditId, entry)
+      updateFavAndOtherLocal(selectedEditId, validatedData.entry)
 
-      Toast.show({
-        type: 'success',
-        text1: '✅ Entry Updated Successfully'
-      })
+      Notification('success', '✅ Data Updated Successfully')
     } else {
-      const data : FavAndOther = {
-        id: uuidv4(),
-        entry,
+      /* ADD ENTRY */
+      const newEntry = {
+        entry: validatedData.entry,
         category: categoryName!,
         section: sectionName!
       }
 
-      const response = await addFavAndOther(data)
+      const response = await addFavAndOther(newEntry)
 
-      if(response.error) {
+      if(response?.error) {
         navigation.navigate('ErrorScreen')
         return
       }
       
-      addFavAndOtherLocal(data)
-
-      Toast.show({
-        type: 'success',
-        text1: '✅ Entry Added Successfully'
-      })
+      addFavAndOtherLocal({...newEntry, id: response.data!})
+      Notification('success', '✅ Entry Added Successfully')
     }
 
     navigation.goBack()
@@ -115,7 +101,7 @@ export default function FavAndOtherFormScreen({navigation, route} : Props) {
               />
             </View>
           
-            <BottomButton onPress={actionEntryHandler}>
+            <BottomButton onPress={actionHandler}>
               {isEditModeEnabled ? 'Save Entry' : 'Add Entry'}
             </BottomButton>
           </View>

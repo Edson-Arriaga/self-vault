@@ -1,5 +1,5 @@
 import { FavAndOther, Memory } from "."
-import { SectionNames } from "../constants/Sections"
+import { Category, SectionNames } from "../constants/Sections"
 
 declare global {
   namespace ReactNavigation {
@@ -9,10 +9,10 @@ declare global {
 
 export type RootStackParamList = {
   Home: undefined
-  MemoryListScreen: { categoryId: string }
-  FavAndOtherListScreen: { categoryId: string, sectionName: SectionNames }
-  MemoryFormScreen: { categoryName: string | undefined, selectedEditId: Memory['id'] }
-  FavAndOtherFormScreen: { categoryName: string | undefined, sectionName: SectionNames | undefined, selectedEditId: FavAndOther['id']}
+  MemoryListScreen: { categoryId: Category['id'] }
+  FavAndOtherListScreen: { categoryId: Category['id'], sectionName: SectionNames }
+  MemoryFormScreen: { categoryName: Category['name'] | undefined, selectedEditId: Memory['id'] | undefined}
+  FavAndOtherFormScreen: { categoryName: Category['name'] | undefined, sectionName: SectionNames | undefined, selectedEditId: FavAndOther['id'] | undefined}
   DisplayMemoryScreen: { memoryId: Memory['id'] }
   ErrorScreen: undefined
 }

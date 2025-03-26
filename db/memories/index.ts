@@ -1,112 +1,73 @@
-import { useDB } from '..';
-import { MemoriesSchema, Memory, MemorySchema } from '../../types';
+import { Memory, MemoryForm } from '../../types';
 import { deleteAsync } from 'expo-file-system';
+import * as SQLite from 'expo-sqlite';
+import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { memoriesTable } from '../schema';
+import { eq } from 'drizzle-orm';
+
+const expo = SQLite.openDatabaseSync('db.db')
+const db = drizzle(expo)
 
 export async function getMemories(){
-  const db = await useDB()
   try {
-    const allRows = await db.getAllAsync('SELECT * FROM memories')
-    const result = MemoriesSchema.safeParse(allRows)
-    if(result.success){
-      return {data: result.data, error: false}
-    }else{
-      return {data: [], error: true, message: 'Error fetching memories' }
-    }
+    const memories = await db.select().from(memoriesTable)
+    return { data: memories }
   } catch (error) {
-    return { data: [], error: true, message: 'Error fetching memories' }
+    return { data: [], error: 'Error fetching memories'}
   }
 }
 
 export async function getMemoryById(memoryId : Memory['id']){
-  const db = await useDB()
   try {
-    const response = await db.getFirstAsync('SELECT * FROM memories WHERE id = ?', memoryId!);
-    const result = MemorySchema.safeParse(response)
-    if(result.success){
-      return {data: result.data, error: false}
-    }else{
-      return {data: {} as Memory, error: true, message: 'Error fetching Memory' }
-    }
+    const memorie = await db.select().from(memoriesTable).where(eq(memoriesTable.id, memoryId))
+    return { data: memorie[0] }
   } catch (error) {
-    return { data: {} as Memory, error: true, message: 'Error fetching Memory' }
+    return { data: {} as Memory, error: 'Error fetching memorie'}
   }
 }
 
-
-export async function addMemory(mem: Memory){
-  const db = await useDB()
-  
+export async function addMemory(mem: MemoryForm & Pick<Memory, 'category'>){
   try {
-    const result = MemorySchema.safeParse(mem)
-    if(!result.success){
-      return { error: true, message: 'Error adding memory' }
-    }
-
-    await db.runAsync('INSERT INTO memories (id, title, description, category, date, imageUri) VALUES (?, ?, ?, ?, ?, ?)', 
-      mem.id!, mem.title, mem.description, mem.category, mem.date, mem.imageUri
-    )
-
-    return { error: false }
-
+    const newMem = await db.insert(memoriesTable).values(mem)
+    return { data : newMem.lastInsertRowId }
   } catch (error) {
-    return { error: true, message: 'Error adding memory' }
+    return { error: 'Error adding memory' }
   }
 }
 
-export async function updateMemory(memoryId: Memory['id'], data: Partial<Memory>){
-  const db = await useDB()
-  
+export async function updateMemory(memoryId: Memory['id'], data: Partial<Memory>, prevImageUri: Memory['imageUri']){    
   try {
-    if (!memoryId || Object.keys(data).length === 0) {
-      return { error: true, message: 'Error updating data' }
+    await db.update(memoriesTable).set(data).where(eq(memoriesTable.id, memoryId))
+
+    if(data.imageUri === ''){
+      await deleteAsync(prevImageUri, {idempotent: true})
     }
-    
-    const keys = Object.keys(data)
-    const values = Object.values(data)
-  
-    const setClause = keys.map(key => `${key} = ?`).join(', ')
 
-    await db.runAsync(`UPDATE memories SET ${setClause} WHERE id = ?`, ...values, memoryId)
-
-    return { error: false }
   } catch (error) {
-    return { error: true, message: 'Error updating data' }
+    return { error: 'Error updating data' }
   }
 }
 
 export async function deleteMemory(memoryId: Memory['id']){
-  const db = await useDB()
-  
   try {
-    if (!memoryId) {
-      return { error: true, message: 'Error deleting memory' }
-    }
-    
-    const result = await db.getFirstAsync<{ imageUri: string }>('SELECT imageUri FROM memories WHERE id = ?', memoryId)
-    const imageUri = result?.imageUri
-  
+    const memorie = await db.select().from(memoriesTable).where(eq(memoriesTable.id, memoryId))
+
+    const imageUri = memorie[0].imageUri
+
     if(imageUri !== ''){
       await deleteAsync(imageUri!, {idempotent: true})
     }
-    
-    await db.runAsync('DELETE FROM memories WHERE id = ?', memoryId)
-    return { error: false }
+
+    await db.delete(memoriesTable).where(eq(memoriesTable.id, memoryId))
   } catch (error) {
-    return { error: true, message: 'Error deleting memory' }
+    return { message: 'Error deleting memory' }
   }
 }
 
-export async function addImage(memoryId: Memory['id'], imageUri : string){
-  const db = await useDB()
-  
+export async function addImage(memoryId: Memory['id'], imageUri : Memory['imageUri']){
   try {
-    if (!imageUri || !memoryId) {
-      return { error: true, message: 'Error adding image' }
-    }
-    
-    await db.runAsync('UPDATE memories SET imageUri = ? WHERE id = ?', imageUri, memoryId)
-    return { error: false }
+    await db.update(memoriesTable).set({imageUri}).where(eq(memoriesTable.id, memoryId))
   } catch (error) {
-    return { error: true, message: 'Error adding image' }
+    return { error: 'Error adding image' }
   }
 }

@@ -1,29 +1,24 @@
 import {z} from 'zod'
+import { memoriesTable, favsAndOthersTable } from '../db/schema';
 
-export const MemorySchema = z.object({
-  id: z.string().optional(),
+/* MEMORY TYPES */
+export type Memory = typeof memoriesTable.$inferSelect
+
+export const MemoryValidationForm = z.object({
   title: z.string().trim().min(1).max(55),
   description: z.string().trim().min(1).max(1500),
-  category: z.string().min(1),
   date: z.string(),
-  imageUri: z.string(),
-  createdAt: z.string().optional()
+  imageUri: z.string()
 })
 
+export type MemoryForm = z.infer<typeof MemoryValidationForm>
 
-export const MemoriesSchema = z.array(MemorySchema) 
 
-export type Memory = z.infer<typeof MemorySchema>
-export type MemoryForm = Pick<Memory, 'title' | 'description' | 'date' | 'imageUri'>
+/* FAV AND OTHER TYPES */
+export type FavAndOther = typeof favsAndOthersTable.$inferSelect
 
-export const FavAndOtherSchema = z.object({
-  id: z.string().optional(),
-  entry: z.string().trim().min(1).max(150),
-  section: z.string().min(1),
-  category: z.string().min(1),
-  createdAt: z.string().optional()
+export const FavAndOtherValidationForm = z.object({
+  entry: z.string().trim().min(1).max(150)
 })
 
-export const FavsAndOthersSchema = z.array(FavAndOtherSchema) 
-
-export type FavAndOther = z.infer<typeof FavAndOtherSchema>
+export type FavAndOtherForm = z.infer<typeof FavAndOtherValidationForm>

@@ -8,33 +8,26 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { Colors } from "../constants/Colors";
 import AppCalendar from "../components/memories/AppCalendar";
 import { addMemory, getMemoryById, updateMemory } from "../db/memories";
-import { MemoryForm } from "../types";
+import { FavAndOtherForm, MemoryForm, MemoryValidationForm } from "../types";
 import { useMemoryStore } from "../stores/memoryStore";
-import Toast from "react-native-toast-message";
 import BottomButton from "../components/ui/BottomButton";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useImages } from "../hooks/useImages";
-import 'react-native-get-random-values'
-import { v4 as uuidv4 } from 'uuid';
+import { filterDifferntFields } from "../utils/filterDifferentFields";
+import Notification from "../components/ui/Notification";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MemoryFormScreen'>;
 
 export default function MemoryFormScreen({navigation, route} : Props) {
 
-  const [prevData, setPrevData] = useState<MemoryForm>()
+  const categoryName = route.params.categoryName
+  const selectedEditId = route.params.selectedEditId
+
+  const [data, setData] = useState({imageUri: '', date: ''} as MemoryForm)
+  const [prevData, setPrevData] = useState({} as MemoryForm)
   const [isDeleteImageIconActive, setIsDeleteImageIconActive] = useState(false)
   const [isActiveCalendar, setIsActiveCalendar] = useState(false)
   
-  const categoryName = route.params.categoryName
-  const selectedEditId = route.params.selectedEditId
-  
-  const [data, setData] = useState<MemoryForm>({
-    title: '',
-    date: '',
-    description: '',
-    imageUri: ''
-  })
-
   const { addMemoryLocal, updateMemoryLocal } = useMemoryStore()
   const { selectAndAddImage } = useImages()
 
@@ -42,18 +35,16 @@ export default function MemoryFormScreen({navigation, route} : Props) {
 
   useEffect(() => {
     async function getMemory(){
-      const memory = await getMemoryById(selectedEditId)
-      
-      const memoryData : MemoryForm = {
-        title: memory.data.title,
-        description: memory.data.description,
-        date: memory.data.date,
-        imageUri: memory.data.imageUri
+      const response = await getMemoryById(selectedEditId!)
+      const formData : MemoryForm = {
+        title: response.data.title,
+        imageUri: response.data.imageUri,
+        description: response.data.description,
+        date: response.data.date,
       }
-
-      setPrevData(memoryData)
-      setData(memoryData)
-      setIsDeleteImageIconActive(!!memoryData.imageUri)
+      setPrevData(formData)
+      setData(formData)
+      setIsDeleteImageIconActive(!!response.data.imageUri)
     }
     if(isEditModeEnabled){
       getMemory()
@@ -61,92 +52,58 @@ export default function MemoryFormScreen({navigation, route} : Props) {
   }, [])
 
   useEffect(() => {
-    navigation.setOptions({
-      headerShown: true,
-      title: ''
-    })
-    
+    navigation.setOptions({ headerShown: true, title: ''})
   }, [navigation])
    
   const pickImageHandler = async () => {
     const result = await selectAndAddImage()
     if(!result?.canceled){
-      setData(prev => ({...prev, imageUri: result?.temporalUri!}))
+      setData(prev => ({...prev, imageUri: result.temporalUri!}))
       setIsDeleteImageIconActive(true)
     }
   }
 
-  async function actionMemoryHandler(){
-    const titleIsValid = data.title.trim().length >= 1 && data.title.trim().length <= 55
-    const descriptionIsValid = data.description.trim().length >= 1 && data.title.trim().length <= 1500
-  
-    if(!titleIsValid || !descriptionIsValid){
-      Toast.show({
-        type: 'error',
-        text1: 'Invalid Fields.',
-        text2: 'Please fill in at least the Title and Description fields.'
-      })
+  async function actionHandler(){
+    /* VALIDATION */
+    const {data : validatedData, error} = MemoryValidationForm.safeParse(data)
+    console.log(validatedData)
+    if(error){
+      Notification('error', 'Invalid Fields.', 'Please fill in at least the Title and Description fields.')
       return
     }
 
     if(isEditModeEnabled){
-      let newData = {} as MemoryForm
-      if(data.title !== prevData?.title){
-        newData = {...newData, title: data.title}
-      }
-      if (data.description !== prevData?.description) {
-        newData = { ...newData, description: data.description };
-      }
-      if (data.date !== prevData?.date) {
-        newData = { ...newData, date: data.date };
-      }
-      if (data.imageUri !== prevData?.imageUri) {
-        newData = { ...newData, imageUri: data.imageUri }
-      }
+      /* UPDATE MEMORY */
+      const differentFields = filterDifferntFields(prevData, validatedData)
+    
 
-      if(Object.keys(newData).length === 0){
-        Toast.show({
-          type: 'info',
-          text1: 'Same Information',
-          text2: 'Please modify some fields before updating.'
-        })
+      if(Object.keys(differentFields).length === 0){
+        Notification('info', 'Same Information', 'Please modify some fields before updating.')
         return
       }
 
-      const response = await updateMemory(selectedEditId, newData)
-
-      if(response.error) {
-        navigation.navigate('ErrorScreen')
-        return
-      }
-
-      updateMemoryLocal(selectedEditId, data)
+      const response = await updateMemory(selectedEditId, differentFields, prevData.imageUri!)
       
-      Toast.show({
-        type: 'success',
-        text1: '✅ Memory Updated Successfully'
-      })
-
-    } else {
-      const completeData = {
-        ...data,
-        id: uuidv4(),
-        category: categoryName!,
-      }
-
-      const response = await addMemory(completeData)
-
-      if(response.error) {
+      if(response?.error) {
         navigation.navigate('ErrorScreen')
         return
       }
 
-      addMemoryLocal(completeData)
+      updateMemoryLocal(selectedEditId, validatedData)
+      Notification('success', '✅ Memory Updated Successfully')
+    } else {
+      /* ADD MEMORY */
+      const newMemory = {...validatedData, category: categoryName!}
+      const response = await addMemory(newMemory)
 
-      Toast.show({
-        type: 'success',
-        text1: '✅ Memory Added Successfully'
-      })
+      if(response?.error) {
+        navigation.navigate('ErrorScreen')
+        return
+      }
+
+      addMemoryLocal({...newMemory, id: response.data!})
+
+      Notification('success', '✅ Memory Added Successfully')
     }
 
     navigation.goBack()
@@ -261,7 +218,7 @@ export default function MemoryFormScreen({navigation, route} : Props) {
             </View>
           </View>
 
-          <BottomButton onPress={actionMemoryHandler}>
+          <BottomButton onPress={actionHandler}>
             {isEditModeEnabled ? 'Save Changes' : 'Add Memory'}
           </BottomButton>
         </View>

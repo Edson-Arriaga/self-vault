@@ -58,7 +58,7 @@ export default function FavAndOtherListScreen({route, navigation} : Props) {
             <FlatList
               scrollEnabled={false}
               data={favsAndOthers.filter(fao => fao.category === category?.name)}
-              keyExtractor={mem => mem.id!}
+              keyExtractor={mem => mem.id.toString()}
               contentContainerStyle={{
                 marginVertical: 16, 
                 marginHorizontal: 10,
@@ -79,10 +79,10 @@ export default function FavAndOtherListScreen({route, navigation} : Props) {
       </ScrollView>
       
       <BottomButton onPress={addEntryHandler}>Add Entry</BottomButton>
-      {isEntryDetailsModalActive && (
+      {(isEntryDetailsModalActive && activeFavAndOtherId) && (
         <FavAndOtherDetailsModal favAndOtherId={activeFavAndOtherId} setIsFavAndOtherDetailsModalActive={setIsEntryDetailsModalActive} />
       )}
-      {isDeleteModalActive && (
+      {(isDeleteModalActive && activeFavAndOtherId) &&  (
         <DeleteFavAndOtherModal setModalStatus={setIsDeleteModalActive} favAndOtherId={activeFavAndOtherId}/>
       )}
     </View>

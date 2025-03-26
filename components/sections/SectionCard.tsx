@@ -1,7 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { Image, Pressable, Text, View } from "react-native";
 import { Category, SectionNames } from "../../constants/Sections";
-import { Colors } from "../../constants/Colors";
 import { useMemoryStore } from "../../stores/memoryStore";
 import { useFavAndOtherStore } from "../../stores/favAndOtherStore";
 import { useRef } from "react";

@@ -13,7 +13,7 @@ type FavAndOtherCardProps = {
   i: number
   setIsEntryDetailsModalActive: React.Dispatch<React.SetStateAction<boolean>>
   setIsDeleteModalActive: React.Dispatch<React.SetStateAction<boolean>>
-  setActiveFavAndOtherId: React.Dispatch<React.SetStateAction<FavAndOther['id']>>
+  setActiveFavAndOtherId: React.Dispatch<React.SetStateAction<FavAndOther['id'] | undefined>>
 }
 
 export default function FavAndOtherCard({fao, i, setIsEntryDetailsModalActive, setIsDeleteModalActive, setActiveFavAndOtherId} : FavAndOtherCardProps) {

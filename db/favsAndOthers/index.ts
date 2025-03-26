@@ -1,86 +1,51 @@
-import { useDB } from ".."
-import { FavAndOther, FavAndOtherSchema, FavsAndOthersSchema } from "../../types"
+import { FavAndOther, FavAndOtherForm } from "../../types"
+import * as SQLite from 'expo-sqlite';
+import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { favsAndOthersTable } from '../schema';
+import { eq } from 'drizzle-orm';
+
+const expo = SQLite.openDatabaseSync('db.db')
+const db = drizzle(expo)
 
 export async function getFavsAndOthers(){
-  const db = await useDB()
   try {
-    const allRows = await db.getAllAsync('SELECT * FROM favsAndOthers')
-    const result = FavsAndOthersSchema.safeParse(allRows)
-    if(result.success){
-      return {data: result.data, error: false}
-    }else{
-      return {data: [], error: true, message: 'Error fetching data' }
-    }
+    const FavsAndOthers = await db.select().from(favsAndOthersTable)
+    return { data: FavsAndOthers }
   } catch (error) {
-    return { data: [], error: true, message: 'Error fetching data' }
+    return { data: [], error: 'Error fetching data'}
   }
 }
 
 export async function getFavAndOtherById(favAndOtherId : FavAndOther['id']){
-  const db = await useDB()
   try {
-    const response = await db.getFirstAsync('SELECT * FROM favsAndOthers WHERE id = ?', favAndOtherId!);
-    const result = FavAndOtherSchema.safeParse(response)
-    if(result.success){
-      return {data: result.data, error: false}
-    }else{
-      return {data: {} as FavAndOther, error: true, message: 'Error fetching data' }
+      const favAndOther = await db.select().from(favsAndOthersTable).where(eq(favsAndOthersTable.id, favAndOtherId))
+      return { data: favAndOther[0] }
+    } catch (error) {
+      return { data: {} as FavAndOther, error: 'Error fetching data'}
     }
-  } catch (error) {
-    return { data: {} as FavAndOther, error: true, message: 'Error fetching data' }
-  }
 }
 
-
-export async function addFavAndOther(favAndOther: FavAndOther){
-  const db = await useDB()
-  
+export async function addFavAndOther(favAndOther: FavAndOtherForm & Pick<FavAndOther, 'category' | 'section'>){
   try {
-    const result = FavAndOtherSchema.safeParse(favAndOther)
-
-    if(!result.success){
-      return { error: true, message: 'Error adding entry' }
-    }
-    console.log(favAndOther)
-    await db.runAsync('INSERT INTO favsAndOthers (id, entry, category, section) VALUES (?, ?, ?, ?)', 
-      favAndOther.id!, favAndOther.entry, favAndOther.category, favAndOther.section
-    )
-
-    return {error: false}
-
+    const newfao = await db.insert(favsAndOthersTable).values(favAndOther)
+    return { data: newfao.lastInsertRowId }
   } catch (error) {
-    return { error: true, message: 'Error adding entry' }
+    return { error: 'Error adding entry' }
   }
 }
 
 export async function updateFavAndOther(favAndOtherId: FavAndOther['id'], entry: FavAndOther['entry']){
-  const db = await useDB()
-  
   try {
-    if (!favAndOtherId) {
-      return { error: true, message: 'Error deleting data' }
-    }
-  
-    await db.runAsync('UPDATE favsAndOthers SET entry = ? WHERE id = ?', entry, favAndOtherId)
-
-    return { error: false }
+    await db.update(favsAndOthersTable).set({entry}).where(eq(favsAndOthersTable.id, favAndOtherId))
   } catch (error) {
-    return { error: true, message: 'Error deleting data' }
+    return { error: 'Error updating data' }
   }
 }
 
 export async function deleteFavAndOther(FavAndOtherId: FavAndOther['id']){
-  const db = await useDB()
-  
   try {
-    if (!FavAndOtherId) {
-      return { error: true, message: 'Error deleting data' }
-    }
-  
-    await db.runAsync('DELETE FROM favsAndOthers WHERE id = ?', FavAndOtherId)
-
-    return { error: false }
+    await db.delete(favsAndOthersTable).where(eq(favsAndOthersTable.id, FavAndOtherId))
   } catch (error) {
-    return { error: true, message: 'Error deleting data' }
+    return { error: 'Error deleting data' }
   }
 }

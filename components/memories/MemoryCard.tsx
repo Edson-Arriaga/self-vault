@@ -13,7 +13,7 @@ type MemoryCardProps = {
   mem: Memory,
   i: number
   setIsDeleteModalActive: React.Dispatch<React.SetStateAction<boolean>>
-  setActiveId: React.Dispatch<React.SetStateAction<Memory['id']>>
+  setActiveId: React.Dispatch<React.SetStateAction<Memory['id'] | undefined>>
 }
 
 export default function MemoryCard({mem, i, setIsDeleteModalActive, setActiveId} : MemoryCardProps) {

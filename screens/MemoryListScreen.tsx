@@ -58,7 +58,7 @@ export default function MemoryListScreen({route, navigation} : Props) {
           <FlatList
             scrollEnabled={false}
             data={memories.filter(mem => mem.category === category?.name)}
-            keyExtractor={mem => mem.id!}
+            keyExtractor={mem => mem.id.toString()}
             contentContainerStyle={{
               marginVertical: 36, 
               marginLeft: 10,
@@ -82,7 +82,7 @@ export default function MemoryListScreen({route, navigation} : Props) {
       {isImageModalActive && (
         <ImageModal />
       )}
-      {isDeleteModalActive && (
+      {(isDeleteModalActive && activeId) && (
         <DeleteMemoryModal memoryId={activeId} setModalStatus={setIsDeleteModalActive}/>
       )}
     </View>

@@ -3,7 +3,7 @@ import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react
 import * as SplashScreen from 'expo-splash-screen';
 import "./global.css"
 import HomeScreen from './screens/HomeScreen';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { RootStackParamList } from './types/navigation';
@@ -14,14 +14,17 @@ import { getMemories } from './db/memories';
 import Toast from 'react-native-toast-message';
 import { useMemoryStore } from './stores/memoryStore';
 import FavAndOtherFormScreen from './screens/FavAndOtherFormScreen';
-import { cleanDB, initDB } from './db';
 import { useFavAndOtherStore } from './stores/favAndOtherStore';
 import { getFavsAndOthers } from './db/favsAndOthers';
 import DisplayMemoryScreen from './screens/DisplayMemoryScreen';
 import MemoryListScreen from './screens/MemoryListScreen';
 import FavAndOtherListScreen from './screens/FavAndOtherListScreen';
-import { AppState } from 'react-native';
 import { deleteAsync, documentDirectory, readDirectoryAsync } from 'expo-file-system';
+import * as SQLite from 'expo-sqlite';
+import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { memoriesTable, favsAndOthersTable } from './db/schema';
+import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
+import migrations from './drizzle/migrations';
 
 const stackScreenOptions : NativeStackNavigationOptions = {
   headerShown: false,
@@ -32,52 +35,43 @@ const stackScreenOptions : NativeStackNavigationOptions = {
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
-
 SplashScreen.preventAutoHideAsync()
 
+const expo = SQLite.openDatabaseSync('db.db')
+const db = drizzle(expo)
+
 export default function App() {
-  
-  const [dataIsReady, setDataIsReady] = useState(false)
+  const { success } = useMigrations(db, migrations)
+
   const {setMemories} = useMemoryStore()
   const {setFavsAndOthers} = useFavAndOtherStore()
-
+  
   useEffect(() => {
-    const loadAppData = async () => {
+    (async () => {
+      // await db.delete(memoriesTable)
+      // await db.delete(favsAndOthersTable)
+
       const resMem = await getMemories()
       const resFao = await getFavsAndOthers()
-      if (resMem.error || resFao.error) {
+
+      if (resMem.error || resFao.error || !success) {
         Toast.show({
           type: 'error',
           text1: 'Error fetching data',
         })
       }
+
       setMemories(resMem.data)
       setFavsAndOthers(resFao.data)
-      setDataIsReady(true)
-    }
 
-    // const directory = documentDirectory
-    // const files = await readDirectoryAsync(documentDirectory!)
-    // console.log('Archivos almacenados:', files)
-    // await cleanDB()
-    // for (const file of files) {
-    //   await deleteAsync(directory + file);
-    // }
+      //const directory = documentDirectory
+      //const files = await readDirectoryAsync(documentDirectory!)
+      //console.log('Archivos almacenados:', files)
 
-    const handleAppStateChange = async (nextAppState: AppState['currentState']) => {
-      if (nextAppState === 'active') {
-        await loadAppData()
-      }
-    }
-
-    initDB()
-    loadAppData()
-
-    const subscription = AppState.addEventListener('change', handleAppStateChange)
-    
-    return () => {
-      subscription.remove();
-    }
+      //for (const file of files) {
+        //await deleteAsync(directory + file)
+      //}
+      })()
   }, [])
 
   const [loaded, error] = useFonts({
@@ -88,12 +82,12 @@ export default function App() {
   })
 
   useEffect(() => {
-    if ((loaded || error) && dataIsReady) {
+    if ((loaded || error)) {
       SplashScreen.hideAsync()
     }
-  }, [loaded, error, dataIsReady])
+  }, [loaded, error])
 
-  if (!loaded && !dataIsReady) {
+  if (!loaded) {
     return null
   }
 
